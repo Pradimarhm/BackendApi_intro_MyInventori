@@ -23,6 +23,6 @@ Route::middleware(['apicheck'])->group(function () {
     Route::prefix('product')->group(function () {
         Route::get('/', [ProductController::class, 'index'])->name('product.index');
         Route::post('/save', [ProductController::class, 'save'])->name('product.save');
-        Route::delete('/{id}/delete', [ProductController::class, 'delete'])->name('product.delete');
+        Route::delete('/delete/{id}', [ProductController::class, 'delete'])->name('product.delete');
     });
 });

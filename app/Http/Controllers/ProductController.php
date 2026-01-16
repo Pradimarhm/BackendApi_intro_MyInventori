@@ -27,7 +27,7 @@ class ProductController extends Controller
 
             return response()->json([
                 'message'=>'Berhasil Tambah Product'
-            ], 200);
+            ], 201);
 
         } catch (Exception $e) {
             return response()->json([
@@ -42,7 +42,7 @@ class ProductController extends Controller
             $product->delete();
             return response()->json([
                 'message'=>'Berhasil Hapus Product'
-            ], 200);
+            ], 202);
 
         } catch (Exception $e) {
             return response()->json([
