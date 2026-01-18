@@ -5,7 +5,11 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\product;
 use Exception;
-// use League\Config\Exception\ValidationException;
+
+use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Storage;
+use Carbon\Carbon;
+
 use Illuminate\Validation\ValidationException;
 
 class ProductController extends Controller
@@ -18,15 +22,21 @@ class ProductController extends Controller
     }
 
     function create(Request $request){
+        $request->validate([
+            'name' => 'required|string',
+            'description' => 'required|string',
+            'image'=>'required|image|mimes:png,jpg,jpeg|max:2048'
+        ]);
+
         try {
-            $request->validate([
-                'name' => 'required|string',
-                'description' => 'required|string',
-            ]);
+            $file = $request->file('image');
+            $imageName = Str::random(10).'.'.$file->getClientOriginalExtension();
+            $file->storeAs('product/image', $imageName, 'public');
 
             $product = new product();
             $product->name = $request->get('name');
             $product->description = $request->get('description');
+            $product->image = $imageName;
             $product->save();
 
             return response()->json([
@@ -75,26 +85,27 @@ class ProductController extends Controller
         $request->validate([
             'name'=>'required',
             'description'=>'required',
-            // 'image'=>'nullable'
+            'image'=>'nullable'
         ]);
         try{
             $product = Product::findOrFail($id);
-            $product->update($request->only(['name', 'description']));
-            // $product->fill($request->post())->update();
-            // if($request->hasFile('image')){
-            // // remove old image
-            //     if($product->image){
-            //         $exists = Storage::disk('public')->exists("product/image/{$product->image}");
-            //         if($exists){
-            //             Storage::disk('public')->delete("product/image/{$product->image}");
-            //         }
-            //     }
-            //     $imageName = Str::random().'.'.$request->image->getClientOriginalExtension;
-            //     Storage::disk('public')->putFileAs('product/image', $request->image,$image);
+            // $product->update($request->only(['name', 'description']));
+            $product->fill($request->post())->update();
+            if($request->hasFile('image')){
+            // remove old image
+                if($product->image){
+                    $exists = Storage::disk('public')->exists("product/image/{$product->image}");
+                    if($exists){
+                        Storage::disk('public')->delete("product/image/{$product->image}");
+                    }
+                }
+                $storage = Storage::disk('public');
+                $imageName = Str::random(10).'.'.$request->image->getClientOriginalExtension();
+                $storage->putFileAs('product/image', $request->image,$imageName);
 
-            //     $product->image = $imageName;
-            //     $product->save();
-            // }
+                $product->image = $imageName;
+                $product->save();
+            }
             return response()->json([
                 'message'=>'Product Updated Successfully!!'
             ]);
