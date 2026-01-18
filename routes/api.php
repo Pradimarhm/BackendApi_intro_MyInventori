@@ -22,7 +22,23 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 Route::middleware(['apicheck'])->group(function () {
     Route::prefix('product')->group(function () {
         Route::get('/', [ProductController::class, 'index'])->name('product.index');
-        Route::post('/save', [ProductController::class, 'save'])->name('product.save');
+
+        Route::get('/{id}', [ProductController::class, 'edit'])->name('product.edit');
+        Route::patch('/update/{id}', [ProductController::class, 'update'])->name('product.update');
+
+        Route::post('/create', [ProductController::class, 'create'])->name('product.create');
+
         Route::delete('/delete/{id}', [ProductController::class, 'delete'])->name('product.delete');
     });
 });
+
+// Route::prefix('product')->group(function () {
+//     Route::get('/', [ProductController::class, 'index'])->name('product.index');
+
+//     Route::get('/{id}', [ProductController::class, 'edit'])->name('product.edit');
+//     Route::patch('/update/{id}', [ProductController::class, 'update'])->name('product.update');
+
+//     Route::post('/create', [ProductController::class, 'create'])->name('product.create');
+
+//     Route::delete('/delete/{id}', [ProductController::class, 'delete'])->name('product.delete');
+// });
